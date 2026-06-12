@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRANNY — Horror Quest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>САМОСБОР — Текстовый квест</title>
 <link rel="preload" href="assets/fonts/RubikWetPaint-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/Pangolin-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <script src="https://yandex.ru/games/sdk/v2"></script>
@@ -34,17 +34,33 @@
   }
 
   :root {
-    --bg: #0a0a0a;
-    --panel: #111;
-    --border: #2a2a2a;
-    --text: #c8c0b0;
-    --text-dim: #665e50;
-    --accent: #8b0000;
-    --accent-glow: #ff2020;
-    --success: #3a6e2e;
+    --bg: #08080c;
+    --panel: #101018;
+    --border: #2a2636;
+    --text: #c4bcd0;
+    --text-dim: #6a6478;
+    --accent: #6b2fb3;
+    --accent-glow: #b14fff;
+    --success: #3a6e5e;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
+
+  /* === п.1.6.2.7: запрет выделения, контекстного меню и подсветки тапа === */
+  html, body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  img, .game-icon {
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
 
   body {
     background: var(--bg);
@@ -52,33 +68,33 @@
     font-family: 'Pangolin', monospace;
     min-height: 100vh;
     overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
   }
 
   #menu-screen {
     position: fixed; inset:0; z-index: 100;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    background: var(--bg);
+    background: radial-gradient(ellipse at center, #160c26 0%, var(--bg) 70%);
     transition: opacity .8s;
+    padding: 1rem;
   }
   #menu-screen.hidden { opacity:0; pointer-events:none; }
 
   #menu-screen h1 {
     font-family: 'Rubik Wet Paint', cursive;
     font-size: clamp(3rem, 10vw, 7rem);
-    color: var(--accent);
-    text-shadow: 0 0 40px rgba(139,0,0,.6), 0 0 80px rgba(139,0,0,.3);
-    letter-spacing: .15em;
-    animation: flicker 4s infinite;
+    color: var(--accent-glow);
+    text-shadow: 0 0 40px rgba(177,79,255,.5), 0 0 80px rgba(107,47,179,.35);
+    letter-spacing: .12em;
+    animation: flicker 5s infinite;
+    text-align: center;
   }
   #menu-screen p {
     color: var(--text-dim);
     margin: 1rem 0 2.5rem;
     font-size: 1.1rem;
     text-align: center;
-    max-width: 420px;
+    max-width: 460px;
     line-height: 1.6;
   }
   #menu-screen button {
@@ -94,70 +110,45 @@
   }
   #menu-screen button:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(255,0,0,.4);
+    box-shadow: 0 0 30px rgba(177,79,255,.45);
   }
 
   @keyframes flicker {
     0%,100%{ opacity:1 }
     92%{ opacity:1 }
-    93%{ opacity:.3 }
+    93%{ opacity:.4 }
     94%{ opacity:1 }
-    96%{ opacity:.5 }
+    96%{ opacity:.6 }
     97%{ opacity:1 }
   }
 
-  #screamer {
-    position: fixed; inset:0; z-index: 999;
-    display: none;
-    align-items: center; justify-content: center;
-    background: #000;
+  /* === Спокойное «поглощение туманом» вместо скримера === */
+  #flash {
+    position: fixed; inset:0; z-index: 300;
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(150,60,230,0) 0%, rgba(20,5,35,0) 80%);
+    transition: opacity 1.3s ease;
   }
-  #screamer.active { display:flex; animation: screamerShake .15s infinite; }
-  #screamer .face {
-    width: 90vmin; height: 90vmin;
-    /* === СКРИМЕР: укажите путь к картинке === */
-    /* background-image: url('assets/screamer.png'); */
-    background-color: #1a0000;
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-  }
-  #screamer .face::before {
-    content: '';
-    font-size: 60vmin;
-    position: absolute; inset:0;
-    display: flex; align-items: center; justify-content: center;
-    filter: contrast(1.8) brightness(1.2);
-    animation: screamerPulse .12s infinite alternate;
-  }
-  @keyframes screamerShake {
-    0%{ transform: translate(0,0) }
-    25%{ transform: translate(-8px,6px) }
-    50%{ transform: translate(6px,-8px) }
-    75%{ transform: translate(-6px,-4px) }
-    100%{ transform: translate(8px,6px) }
-  }
-  @keyframes screamerPulse {
-    from { transform: scale(1); filter: brightness(1.5) contrast(2); }
-    to   { transform: scale(1.08); filter: brightness(2) contrast(2.5); }
+  #flash.active {
+    opacity: 1;
+    background: radial-gradient(ellipse at center, rgba(150,60,230,.5) 0%, rgba(16,5,30,.96) 80%);
   }
 
   #end-screen {
     position: fixed; inset:0; z-index: 200;
     display: none; flex-direction: column;
     align-items: center; justify-content: center;
-    background: rgba(0,0,0,.95);
+    background: rgba(8,6,14,.96);
+    padding: 1rem;
   }
   #end-screen.active { display:flex; }
   #end-screen h2 {
     font-family: 'Rubik Wet Paint', cursive;
-    font-size: 3.5rem;
+    font-size: clamp(2.2rem, 8vw, 3.5rem);
     text-align: center;
     margin-bottom: 1rem;
   }
-  #end-screen p { color: var(--text-dim); margin-bottom: 2rem; font-size: 1.1rem; text-align:center; max-width:400px; }
+  #end-screen p { color: var(--text-dim); margin-bottom: 2rem; font-size: 1.1rem; text-align:center; max-width:420px; }
   #end-screen button {
     font-family: 'Rubik Wet Paint', cursive;
     font-size: 1.3rem;
@@ -179,7 +170,7 @@
     align-items: center;
     justify-content: space-between;
     padding: .6rem 1.2rem;
-    background: #0d0d0d;
+    background: #0c0a12;
     border-bottom: 1px solid var(--border);
     font-size: .85rem;
     flex-shrink: 0;
@@ -195,10 +186,10 @@
   }
   #hud .noise-bar .bar .fill {
     height: 100%; width: 0%;
-    background: linear-gradient(90deg, #4a0, #a00);
+    background: linear-gradient(90deg, #4a0a8a, #b14fff);
     transition: width .4s;
   }
-  #timer-display { font-family: 'Rubik Wet Paint', cursive; font-size: 1.3rem; color: var(--accent); }
+  #timer-display { font-family: 'Rubik Wet Paint', cursive; font-size: 1.3rem; color: var(--accent-glow); }
   #mute-btn {
     background: none; border: none; cursor: pointer;
     color: var(--text-dim); font-size: 1.2rem; padding: 0 .2rem;
@@ -213,7 +204,7 @@
 
   #room-bg {
     height: 40%; min-height: 160px;
-    background-color: #0e0e0e;
+    background-color: #0e0c12;
     background-size: cover; background-position: bottom;
     position: relative;
     border-bottom: 1px solid var(--border);
@@ -223,19 +214,19 @@
   #room-bg .room-label {
     font-family: 'Rubik Wet Paint', cursive;
     font-size: clamp(1.5rem, 4vw, 2.5rem);
-    color: rgba(200,190,170,.25);
+    color: rgba(196,188,208,.25);
     text-transform: uppercase;
     letter-spacing: .3em;
     pointer-events: none;
   }
   #room-bg::before {
     content:''; position: absolute; inset:0; z-index: 1;
-    background: rgba(0,0,0,.5);
+    background: rgba(20,8,36,.45);
     pointer-events: none;
   }
   #room-bg::after {
     content:''; position: absolute; inset:0; z-index: 2;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.5) 100%);
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(8,4,16,.6) 100%);
     pointer-events: none;
   }
   #room-bg .room-label { z-index: 3; }
@@ -245,25 +236,25 @@
     line-height: 1.75; font-size: 1rem; color: var(--text);
     scrollbar-width: thin; scrollbar-color: #333 transparent;
   }
-  #scene-text .event { color: #cc3; font-style: italic; }
+  #scene-text .event { color: #b9a7e6; font-style: italic; }
   #scene-text .danger { color: var(--accent-glow); }
 
   #actions {
     padding: .8rem 1rem; display: flex; flex-wrap: wrap; gap: .5rem;
-    background: #0d0d0d; border-top: 1px solid var(--border); flex-shrink: 0;
+    background: #0c0a12; border-top: 1px solid var(--border); flex-shrink: 0;
   }
   #actions button {
     font-family: 'Pangolin', monospace;
     font-size: .95rem; padding: .55rem 1.2rem;
-    background: #1a1a1a; color: var(--text);
-    border: 1px solid #333; cursor: pointer;
+    background: #181420; color: var(--text);
+    border: 1px solid #332b40; cursor: pointer;
     transition: all .2s;
   }
   #actions button:hover {
-    background: #2a1a1a; border-color: var(--accent); color: #fff;
+    background: #241a32; border-color: var(--accent-glow); color: #fff;
   }
   #actions button.item-action {
-    border-color: var(--success); color: #8c8;
+    border-color: var(--success); color: #8cc;
   }
   .exit-row { display: flex; gap: .3rem; }
   .exit-row button:first-child { flex: 1; }
@@ -271,21 +262,21 @@
     padding: .55rem .7rem !important;
     font-size: .75rem !important;
     color: #666 !important;
-    border-color: #2a2a2a !important;
+    border-color: #2a2636 !important;
     flex-shrink: 0;
   }
   .listen-btn:hover { color: #aaa !important; border-color: #555 !important; }
 
   #inventory-panel {
-    padding: .5rem 1rem; background: #080808;
+    padding: .5rem 1rem; background: #070610;
     border-top: 1px solid var(--border);
     font-size: .8rem; color: var(--text-dim);
     display: flex; gap: .8rem; flex-wrap: wrap;
     flex-shrink: 0; min-height: 2rem;
   }
   #inventory-panel span {
-    background: #1a1a1a; padding: .2rem .6rem;
-    border: 1px solid #333; border-radius: 3px;
+    background: #181420; padding: .2rem .6rem;
+    border: 1px solid #332b40; border-radius: 3px;
   }
 
   .fade-in { animation: fadeIn .6s ease; }
@@ -295,12 +286,12 @@
 <body>
 
 <div id="menu-screen">
-  <h1 id="menu-title">БАБКА</h1>
+  <h1 id="menu-title">САМОСБОР</h1>
   <p id="menu-desc"></p>
   <button id="menu-btn" onclick="startGame()"></button>
 </div>
 
-<div id="screamer"><div class="face"></div></div>
+<div id="flash"></div>
 
 <div id="end-screen">
   <h2 id="end-title"></h2>
@@ -329,7 +320,7 @@
 
 <script>
 // ============================================================
-//  YANDEX GAMES SDK
+//  YANDEX GAMES SDK + Game Ready API
 // ============================================================
 let ysdk = null;
 const bl = (navigator.language || 'ru').slice(0, 2);
@@ -345,32 +336,40 @@ async function initYSDK() {
   } catch(e) {
     console.warn('Yandex SDK not available, using browser lang:', lang);
   }
-  applyLang();
+}
+
+// Game Ready API: сообщаем платформе, что игра загружена
+function notifyGameReady() {
+  try { ysdk && ysdk.features && ysdk.features.LoadingAPI && ysdk.features.LoadingAPI.ready(); }
+  catch(e) { console.warn('LoadingAPI.ready error:', e); }
+}
+// Gameplay API: старт/стоп активного игрового процесса
+function gameplayStart() {
+  try { ysdk && ysdk.features && ysdk.features.GameplayAPI && ysdk.features.GameplayAPI.start(); }
+  catch(e) {}
+}
+function gameplayStop() {
+  try { ysdk && ysdk.features && ysdk.features.GameplayAPI && ysdk.features.GameplayAPI.stop(); }
+  catch(e) {}
 }
 
 let muted = false;
 function toggleMute() {
   muted = !muted;
-  if (audioCtx) audioCtx.destination.channelCount; // ensure exists
-  if (bgMusicAudio) bgMusicAudio.muted = muted;
-  if (audioCtx) {
-    if (muted) audioCtx.suspend(); else if (!state || !state.paused) audioCtx.resume();
-  }
+  if (masterGain) masterGain.gain.value = muted ? 0 : 1;
   document.getElementById('mute-btn').innerHTML = muted ? icon('sound-off') : icon('sound-on');
 }
 
+// Пауза/возобновление: останавливает игровой цикл и ВЕСЬ звук
 function pauseGame() {
   if (state) state.paused = true;
-  if (bgMusicAudio) bgMusicAudio.pause();
-  if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
+  suspendAudio();
+  gameplayStop();
 }
-
 function resumeGame() {
   if (state) state.paused = false;
-  if (!muted) {
-    if (bgMusicAudio && state && !state.dead && !state.escaped) bgMusicAudio.play().catch(()=>{});
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  }
+  if (state && !state.dead && !state.escaped) gameplayStart();
+  resumeAudio();
 }
 
 function showInterstitialAd() {
@@ -436,60 +435,60 @@ async function savePlayerBestTime(seconds) {
 // ============================================================
 const L = {
   ru: {
-    title: 'БАБКА',
-    menuDesc: 'Ты проснулся в тёмном доме. Старуха где-то рядом. У тебя есть 5 минут, чтобы выбраться... или она тебя найдёт.',
+    title: 'САМОСБОР',
+    menuDesc: 'Завыла сирена — Самосбор накрывает блок гигахрущёвки. У тебя 5 минут, чтобы выбраться за гермодверь, пока волна не пересобрала этаж. И не шуми: по коридорам уже кто-то бродит.',
     start: 'НАЧАТЬ',
     restart: 'ЗАНОВО',
     leaderboard: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/leaderbord.svg);mask-image:url(assets/icons/leaderbord.svg)"></span> Таблица лидеров',
     noiseLabel: 'Шум:',
     items: 'предметов',
-    statusSleep: 'Не знает',
-    statusAlert: 'Насторожена',
+    statusSleep: 'Не чует',
+    statusAlert: 'Насторожён',
     statusSearch: 'Ищет тебя',
     statusNear: 'РЯДОМ',
     listenBtn: 'Прислушаться',
-    listenDanger: (room) => `<span class="danger">За дверью в «${room}» — тяжёлые шаги и скрип половиц. ОНА ТАМ. Не входи.</span>`,
-    listenNear: (room) => `<span class="danger">Со стороны «${room}» доносятся слабые звуки... Она где-то рядом. Будь осторожен.</span>`,
-    listenSafe: (room) => `<span class="event">За дверью в «${room}» — тишина. Кажется, путь свободен.</span>`,
-    caughtTitle: 'ОНА ТЕБЯ ПОЙМАЛА',
-    caughtText: 'Бабка схватила тебя. Никто не слышал твоих криков...',
-    timeUpText: 'Время вышло. Бабка нашла тебя в темноте...',
-    winTitle: 'ТЫ СБЕЖАЛ!',
-    winText: (m,s,n) => `Ты выбрался из дома Бабки за ${m}:${s}! Предметов: ${n}.`,
-    intro: 'Ты открыл глаза. Голова раскалывается. Где ты? Чей это дом? Нужно выбраться, пока она не пришла...',
+    listenDanger: (room) => `<span class="danger">За дверью в «${room}» — влажное дыхание и скрежет. СБОРЩИК ТАМ. Не входи.</span>`,
+    listenNear: (room) => `<span class="danger">Со стороны «${room}» доносится шорох... Сборщик где-то рядом. Будь осторожен.</span>`,
+    listenSafe: (room) => `<span class="event">За дверью в «${room}» — тихо. Кажется, путь свободен.</span>`,
+    caughtTitle: 'ТЕБЯ ПЕРЕСОБРАЛО',
+    caughtText: 'Сборщик нашёл тебя. Туман сомкнулся — и ты стал частью Самосбора...',
+    timeUpText: 'Волна Самосбора накрыла блок. Бетон поплыл, и от тебя ничего не осталось...',
+    winTitle: 'ТЫ ВЫРВАЛСЯ!',
+    winText: (m,s,n) => `Ты ушёл из блока за гермодверь за ${m}:${s}! Собрано предметов: ${n}.`,
+    intro: 'Ты очнулся на полу жилблока. Над дверью мигает сигнальная лампа — Самосбор. Сирена уже смолкла, значит, времени почти не осталось. Надо открыть гермодверь подъезда или грузовой шлюз и уйти из блока, пока тебя не пересобрало...',
     rooms: {
-      bedroom: { name: 'Спальня', desc: 'Маленькая комната с продавленной кроватью и пыльным шкафом. Тусклый лунный свет пробивается через заколоченное окно. На стене — царапины.' },
-      hallway: { name: 'Коридор', desc: 'Длинный тёмный коридор. Обои свисают лоскутами. Половицы скрипят при каждом шаге. Пахнет сыростью.' },
-      kitchen:  { name: 'Кухня', desc: 'Грязная кухня. На столе — остатки чего-то несъедобного. Ножи воткнуты прямо в стену. Из крана капает ржавая вода.' },
-      living:   { name: 'Гостиная', desc: 'Большая комната с покосившейся мебелью. Старый телевизор показывает помехи. Массивная входная дверь заперта на три замка.' },
-      bathroom: { name: 'Ванная', desc: 'Зеркало над раковиной треснуло. Ванна наполовину заполнена мутной водой. Что-то плавает на поверхности...' },
-      attic:    { name: 'Чердак', desc: 'Пыльный чердак под наклонной крышей. Повсюду коробки и старые вещи. Крысы шуршат в темноте.' },
-      basement: { name: 'Подвал', desc: 'Холодный сырой подвал. Лампочка мигает. В углу — верстак с инструментами. Пахнет землёй и ржавчиной.' },
-      garage:   { name: 'Гараж', desc: 'Тесный гараж. Ржавая машина без колёс. Ворота — массивные, с кодовым замком. Это может быть выходом!' },
+      bedroom: { name: 'Жилблок', desc: 'Тесная бетонная ячейка с продавленной койкой и шкафом. Сигнальная лампа над дверью заливает стены багровым. За заколоченным окном клубится фиолетовая муть Самосбора.' },
+      hallway: { name: 'Коридор', desc: 'Длинный бетонный коридор гигахрущёвки. Лампы мигают, обои свисают лоскутами. Сквозь щели сочится сизый туман. Плиты гудят под ногами.' },
+      kitchen:  { name: 'Общая кухня', desc: 'Коммунальная кухня блока. На столе — остывшая еда, будто все ушли мгновение назад. Ножи на магнитной планке. Из крана капает ржавая вода.' },
+      living:   { name: 'Холл', desc: 'Холл перед выходом из блока. Старый приёмник хрипит помехами. Массивная гермодверь подъезда заперта на три замка.' },
+      bathroom: { name: 'Душевая', desc: 'Общая душевая. Зеркало над раковиной треснуло. Поддон наполовину залит мутной водой. Что-то плавает на поверхности...' },
+      attic:    { name: 'Технический этаж', desc: 'Технический этаж под перекрытием. Повсюду коробки, кабель-каналы и старый хлам. В темноте что-то шуршит.' },
+      basement: { name: 'Бойлерная', desc: 'Холодная сырая бойлерная. Лампа мигает. В углу — верстак с инструментами. Пахнет землёй и ржавчиной.' },
+      garage:   { name: 'Грузовой шлюз', desc: 'Тесный грузовой шлюз. Ржавая тележка без колёс. Внешняя створка — массивная, с кодовым замком. Это может быть выходом!' },
     },
     exits: {
-      hallway: 'Коридор', bedroom: 'Спальня', kitchen: 'Кухня',
-      living: 'Гостиная', bathroom: 'Ванная',
-      attic: 'Чердак (вверх)', basement: 'Подвал (вниз)',
-      garage: 'Гараж',
+      hallway: 'Коридор', bedroom: 'Жилблок', kitchen: 'Кухня',
+      living: 'Холл', bathroom: 'Душевая',
+      attic: 'Техэтаж (вверх)', basement: 'Бойлерная (вниз)',
+      garage: 'Грузовой шлюз',
       hallFromAttic: 'Спуститься в коридор', hallFromBasement: 'Подняться в коридор',
       backToKitchen: 'Вернуться в кухню',
     },
-    screwdriver: 'Отвёртка', knife: 'Нож', basementKey: 'Ключ от подвала',
-    atticKey: 'Ключ от чердака', pliers: 'Плоскогубцы', frontKey: 'Ключ от входной двери',
-    code1: 'Код (фрагмент 1)', code2: 'Код (фрагмент 2)', code3: 'Код (фрагмент 3)',
+    screwdriver: 'Отвёртка', knife: 'Нож', basementKey: 'Ключ от бойлерной',
+    atticKey: 'Ключ от техэтажа', pliers: 'Плоскогубцы', frontKey: 'Ключ от гермодвери',
+    code1: 'Код шлюза (фрагмент 1)', code2: 'Код шлюза (фрагмент 2)', code3: 'Код шлюза (фрагмент 3)',
     actSearchWardrobe: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Обыскать шкаф',
     actFoundScrewdriver: 'Ты осторожно открыл шкаф. Среди тряпья нашлась <b>отвёртка</b>. Может пригодиться.',
-    actTakeKnife: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Взять нож со стены',
-    actFoundKnife: 'Ты выдернул нож из стены. Рука дрожит.',
+    actTakeKnife: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Снять нож с планки',
+    actFoundKnife: 'Ты снял нож с магнитной планки. Рука дрожит.',
     actSearchDrawers: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Обыскать ящики',
-    actFoundBasementKey: 'В одном из ящиков, под газетами 1987-го года, ты нашёл <b>ключ с биркой «ПОДВАЛ»</b>.',
-    actLookBath: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Посмотреть в ванну',
-    actFoundCode1: 'Ты опустил руку в мутную воду... Пальцы нащупали пластиковый пакет. Внутри — записка: <b>«7 _ _»</b>. Первая часть кода!',
+    actFoundBasementKey: 'В одном из ящиков, под газетами 1987-го года, ты нашёл <b>ключ с биркой «БОЙЛЕРНАЯ»</b>.',
+    actLookBath: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Заглянуть в поддон',
+    actFoundCode1: 'Ты опустил руку в мутную воду... Пальцы нащупали пластиковый пакет. Внутри — записка: <b>«7 _ _»</b>. Первая часть кода шлюза!',
     actCutPanel: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Вскрыть панель под раковиной',
-    actFoundAtticKey: 'Ножом удалось поддеть декоративную панель. За ней — <b>ключ от чердака</b>, обмотанный изолентой.',
-    actDoorLocked: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/padlock.svg);mask-image:url(assets/icons/padlock.svg)"></span> Дверь заперта',
-    actNeedKey: 'Дверь заперта. Нужен ключ.',
+    actFoundAtticKey: 'Ножом удалось поддеть декоративную панель. За ней — <b>ключ от техэтажа</b>, обмотанный изолентой.',
+    actDoorLocked: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/padlock.svg);mask-image:url(assets/icons/padlock.svg)"></span> Заперто',
+    actNeedKey: 'Заперто. Нужен ключ.',
     actSearchBoxes: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Обыскать коробки',
     actFoundCode2: 'Среди хлама ты нашёл старую фотографию. На обороте написано: <b>«_ 3 _»</b>. Вторая часть кода!',
     actTakePliers: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/screwdriver.svg);mask-image:url(assets/icons/screwdriver.svg)"></span> Взять плоскогубцы',
@@ -498,62 +497,62 @@ const L = {
     actFoundCode3All: 'На верстаке, нацарапанное гвоздём: <b>«_ _ 9»</b>. Третья часть кода! Полный код: <b>739</b>.',
     actFoundCode3Part: 'На верстаке, нацарапанное гвоздём: <b>«_ _ 9»</b>. Ещё одна часть кода! Нужно найти остальные фрагменты.',
     actOpenPanel: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/screwdriver.svg);mask-image:url(assets/icons/screwdriver.svg)"></span> Вскрыть электрощит отвёрткой',
-    actFoundFrontKey: 'За панелью электрощита был спрятан <b>ключ от входной двери</b>! Но это только один замок из трёх...',
-    actExamineDoor: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Осмотреть входную дверь',
-    actDoorStatus: (k,p,c) => `Массивная дверь. Три замка:<br>${k} Верхний замок<br>${p} Средний засов<br>${c} Нижний кодовый замок`,
+    actFoundFrontKey: 'За панелью электрощита был спрятан <b>ключ от гермодвери</b>! Но это только один замок из трёх...',
+    actExamineDoor: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Осмотреть гермодверь',
+    actDoorStatus: (k,p,c) => `Массивная гермодверь. Три замка:<br>${k} Верхний замок<br>${p} Средний засов<br>${c} Нижний кодовый замок`,
     actUnlockAll: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Открыть все замки!',
-    actUnlockedMsg: '<span class="event">Ты вставил ключ... провернул. Плоскогубцами выломал засов. Набрал 739... Щелчок! ВСЕ ЗАМКИ ОТКРЫТЫ!</span>\n<span class="danger">Но шум привлёк Бабку! Она где-то близко! БЕГИ!</span>',
-    actRun: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> БЕЖАТЬ НА УЛИЦУ!',
-    actCodeLock: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Кодовый замок на воротах',
-    actCodeLockDesc: 'На воротах — кодовый замок. Три цифры. Тебе нужно найти код.',
+    actUnlockedMsg: '<span class="event">Ты вставил ключ... провернул. Плоскогубцами выломал засов. Набрал 739... Щелчок! ВСЕ ЗАМКИ ОТКРЫТЫ!</span>\n<span class="danger">Но грохот привлёк Сборщика! Он где-то близко! БЕГИ!</span>',
+    actRun: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> ВЫРВАТЬСЯ ИЗ БЛОКА!',
+    actCodeLock: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Кодовый замок на створке',
+    actCodeLockDesc: 'На створке шлюза — кодовый замок. Три цифры. Тебе нужно найти код.',
     actEnterCode: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Ввести код 739',
-    actGarageOpen: '<span class="event">Ты набрал 739... Механизм загудел, ворота поползли вверх с жутким скрежетом!</span>\n<span class="danger">Этот звук точно услышала Бабка!</span>',
-    actRunGarage: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> ВЫБЕЖАТЬ ЧЕРЕЗ ВОРОТА!',
-    actHide: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/unaware.svg);mask-image:url(assets/icons/unaware.svg)"></span> Спрятаться',
-    creakMsg: 'Где-то в доме скрипнула половица...',
-    lockedBasement: 'Дверь в подвал заперта. Нужен ключ.',
-    lockedAttic: 'Дверь на чердак заперта. Нужен ключ.',
-    noiseWarning40: 'Ты шумишь. Осторожнее — она слышит лучше, чем кажется.',
-    noiseWarning60: 'Слишком громко. Если она рядом — она уже идёт к тебе.',
-    noiseWarning80: 'Чересчур! Этот грохот разбудит и мёртвого. Она точно слышала.',
+    actGarageOpen: '<span class="event">Ты набрал 739... Механизм загудел, створка поползла вверх с жутким скрежетом!</span>\n<span class="danger">Этот звук точно услышал Сборщик!</span>',
+    actRunGarage: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> УЙТИ ЧЕРЕЗ ШЛЮЗ!',
+    actHide: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/unaware.svg);mask-image:url(assets/icons/unaware.svg)"></span> Затаиться',
+    creakMsg: 'Где-то в блоке скрипнула плита перекрытия...',
+    lockedBasement: 'Гермодверь бойлерной заперта. Нужен ключ.',
+    lockedAttic: 'Люк на техэтаж заперт. Нужен ключ.',
+    noiseWarning40: 'Ты шумишь. Осторожнее — Сборщик слышит лучше, чем кажется.',
+    noiseWarning60: 'Слишком громко. Если он рядом — он уже идёт к тебе.',
+    noiseWarning80: 'Грохот на весь блок. Такой шум услышит и пересобранный. Сборщик точно знает, где ты.',
     hideSafe: [
       'Ты затаился в тени. Тишина... Кажется, можно двигаться.',
       'Ты замер, не дыша. Прошла минута — ни звука. Осторожно продолжай.',
-      'Ты переждал в темноте. Дом молчит. Путь кажется свободным.',
-      'Ты прижался к стене и затих. Тихо. Пора двигаться — но осторожно.',
+      'Ты переждал в темноте. Блок молчит. Путь кажется свободным.',
+      'Ты прижался к бетонной стене и затих. Тихо. Пора двигаться — но осторожно.',
     ],
     hideNear: [
-      'Ты затаился... Слышишь шаркающие шаги. Они замедлились... и стали удаляться. Бабка уходит!',
-      'Ты спрятался и задержал дыхание. Шаги прямо за стеной... Она развернулась и ушла. Пронесло!',
-      'Ты замер. Дверная ручка дёрнулась... но не повернулась. Бабка прошла мимо!',
-      'Ты вжался в стену. Тень мелькнула в щели под дверью... и исчезла. Она ушла.',
-      'Ты спрятался за мебелью. Бабка заглянула в комнату... не заметила тебя и побрела дальше.',
+      'Ты затаился... Слышишь влажные шаги. Они замедлились... и стали удаляться. Сборщик уходит!',
+      'Ты задержал дыхание. Шаги прямо за стеной... Он развернулся и ушёл. Пронесло!',
+      'Ты замер. Ручка гермодвери дёрнулась... но не повернулась. Сборщик прошёл мимо!',
+      'Ты вжался в стену. Тень мелькнула в щели под дверью... и растаяла в тумане. Он ушёл.',
+      'Ты спрятался за коробками. Сборщик заглянул в комнату... не заметил тебя и побрёл дальше.',
     ],
     hideAlert: [
-      'Ты затаился и не шевелился. Бабка бродила рядом, бормоча... Наконец её шаги стихли. Она потеряла след!',
-      'Ты спрятался. Бабка остановилась у двери, принюхиваясь... Потом зарычала и ушла искать в другом месте.',
-      'Ты замер. Бабка стояла в коридоре, прислушиваясь. Целую вечность... Потом развернулась и захромала прочь.',
+      'Ты затаился и не шевелился. Сборщик бродил рядом, бормоча чужими голосами... Наконец шаги стихли. Он потерял след!',
+      'Ты спрятался. Сборщик остановился у двери, принюхиваясь... Потом утробно заворчал и ушёл искать в другом месте.',
+      'Ты замер. Сборщик стоял в коридоре, вслушиваясь. Целую вечность... Потом развернулся и уволокся прочь.',
     ],
     grannyNearby: [
-      'Шаги — совсем рядом. Бабка за стеной, ты это чувствуешь.',
-      'За дверью — хриплое сопение. Она стоит и слушает.',
-      'Скрип половиц прямо у твоей комнаты. Не двигайся.',
-      'Тень мелькнула в щели под дверью. Она ТУТ.',
+      'Шаги — совсем рядом. Сборщик за стеной, ты это чувствуешь.',
+      'За дверью — влажное сопение. Он стоит и слушает.',
+      'Скрежет по бетону прямо у твоей комнаты. Не двигайся.',
+      'Тень мелькнула в щели под дверью. Он ТУТ.',
       'Медленные, тяжёлые шаги. Всё ближе... ближе...',
     ],
     grannyFar: [
-      'Откуда-то из глубины дома доносится шарканье. Она бродит.',
-      'Приглушённый скрип — где-то открылась дверь.',
-      'В тишине — далёкий звук шагов. Она тебя ещё не учуяла.',
-      'Что-то упало в другой комнате. Она ищет, но не знает где ты.',
-      'Медленное шарканье подошв. Далеко — но это не значит безопасно.',
+      'Откуда-то из глубины блока доносится шарканье. Он бродит.',
+      'Приглушённый скрежет — где-то отошла гермодверь.',
+      'В тумане — далёкий звук шагов. Он тебя ещё не учуял.',
+      'Что-то рухнуло в другой комнате. Он ищет, но не знает, где ты.',
+      'Медленное шарканье по бетону. Далеко — но это не значит безопасно.',
     ],
     actWatchAd: '[ +60 сек. за рекламу ]',
     actAdRewarded: 'Ты выиграл время! +60 секунд.',
   },
   en: {
-    title: 'GRANNY',
-    menuDesc: 'You woke up in a dark house. The old woman is somewhere nearby. You have 5 minutes to escape... or she will find you.',
+    title: 'SAMOSBOR',
+    menuDesc: 'The siren wailed — a Samosbor is sweeping the block of the Gigahrushovka. You have 5 minutes to get out through the hermetic door before the wave reassembles the floor. And stay quiet: something already wanders the corridors.',
     start: 'START',
     restart: 'RESTART',
     leaderboard: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/leaderbord.svg);mask-image:url(assets/icons/leaderbord.svg)"></span> Leaderboard',
@@ -564,48 +563,48 @@ const L = {
     statusSearch: 'Searching',
     statusNear: 'NEARBY',
     listenBtn: 'Listen',
-    listenDanger: (room) => `<span class="danger">Heavy footsteps behind the «${room}» door. SHE IS THERE. Don't enter.</span>`,
-    listenNear: (room) => `<span class="danger">Faint sounds from «${room}»... She's somewhere close. Be careful.</span>`,
+    listenDanger: (room) => `<span class="danger">Wet breathing and scraping behind the «${room}» door. THE GATHERER IS THERE. Don't enter.</span>`,
+    listenNear: (room) => `<span class="danger">Faint rustling from «${room}»... The Gatherer is somewhere close. Be careful.</span>`,
     listenSafe: (room) => `<span class="event">Silence behind the «${room}» door. The way seems clear.</span>`,
-    caughtTitle: 'SHE GOT YOU',
-    caughtText: 'Granny grabbed you. No one heard your screams...',
-    timeUpText: 'Time is up. Granny found you in the dark...',
-    winTitle: 'YOU ESCAPED!',
-    winText: (m,s,n) => `You escaped Granny's house in ${m}:${s}! Items found: ${n}.`,
-    intro: 'You opened your eyes. Your head is pounding. Where are you? Whose house is this? You need to get out before she comes...',
+    caughtTitle: 'YOU WERE REASSEMBLED',
+    caughtText: 'The Gatherer found you. The fog closed in — and you became part of the Samosbor...',
+    timeUpText: 'The Samosbor wave swept the block. The concrete flowed, and nothing of you remained...',
+    winTitle: 'YOU BROKE FREE!',
+    winText: (m,s,n) => `You left the block through the hermetic door in ${m}:${s}! Items gathered: ${n}.`,
+    intro: 'You came to on the floor of a living cell. A warning lamp blinks above the door — Samosbor. The siren has already gone quiet, so there is almost no time left. You must open the entrance hermetic door or the cargo airlock and leave the block before you get reassembled...',
     rooms: {
-      bedroom: { name: 'Bedroom', desc: 'A small room with a sagging bed and a dusty wardrobe. Dim moonlight seeps through the boarded window. Scratch marks on the wall.' },
-      hallway: { name: 'Hallway', desc: 'A long dark hallway. Wallpaper hangs in strips. The floorboards creak with every step. It smells of damp.' },
-      kitchen:  { name: 'Kitchen', desc: 'A filthy kitchen. Leftover something inedible on the table. Knives stuck into the wall. Rusty water drips from the faucet.' },
-      living:   { name: 'Living Room', desc: 'A large room with crooked furniture. An old TV shows static. The massive front door is locked with three locks.' },
-      bathroom: { name: 'Bathroom', desc: 'The mirror above the sink is cracked. The bathtub is half-filled with murky water. Something floats on the surface...' },
-      attic:    { name: 'Attic', desc: 'A dusty attic under the slanted roof. Boxes and old things everywhere. Rats rustle in the dark.' },
-      basement: { name: 'Basement', desc: 'A cold damp basement. The lightbulb flickers. A workbench with tools in the corner. Smells of earth and rust.' },
-      garage:   { name: 'Garage', desc: 'A cramped garage. A rusty car without wheels. The gate is massive, with a code lock. This could be the way out!' },
+      bedroom: { name: 'Living Cell', desc: 'A cramped concrete cell with a sagging cot and a wardrobe. A warning lamp above the door floods the walls in crimson. Violet Samosbor haze churns behind the boarded window.' },
+      hallway: { name: 'Corridor', desc: 'A long concrete corridor of the Gigahrushovka. Lamps flicker, wallpaper hangs in strips. Grey fog seeps through the cracks. The slabs hum underfoot.' },
+      kitchen:  { name: 'Communal Kitchen', desc: 'The block\'s communal kitchen. Food left cold on the table, as if everyone left a moment ago. Knives on a magnetic strip. Rusty water drips from the faucet.' },
+      living:   { name: 'Lobby', desc: 'The lobby before the block exit. An old radio hisses static. The massive entrance hermetic door is locked with three locks.' },
+      bathroom: { name: 'Shower Room', desc: 'A communal shower room. The mirror above the sink is cracked. The basin is half-filled with murky water. Something floats on the surface...' },
+      attic:    { name: 'Technical Floor', desc: 'A technical floor under the ceiling slab. Boxes, cable trays and old junk everywhere. Something rustles in the dark.' },
+      basement: { name: 'Boiler Room', desc: 'A cold damp boiler room. The lightbulb flickers. A workbench with tools in the corner. Smells of earth and rust.' },
+      garage:   { name: 'Cargo Airlock', desc: 'A cramped cargo airlock. A rusty cart without wheels. The outer hatch is massive, with a code lock. This could be the way out!' },
     },
     exits: {
-      hallway: 'Hallway', bedroom: 'Bedroom', kitchen: 'Kitchen',
-      living: 'Living Room', bathroom: 'Bathroom',
-      attic: 'Attic (up)', basement: 'Basement (down)',
-      garage: 'Garage',
-      hallFromAttic: 'Go down to hallway', hallFromBasement: 'Go up to hallway',
+      hallway: 'Corridor', bedroom: 'Living Cell', kitchen: 'Kitchen',
+      living: 'Lobby', bathroom: 'Shower Room',
+      attic: 'Tech Floor (up)', basement: 'Boiler Room (down)',
+      garage: 'Cargo Airlock',
+      hallFromAttic: 'Go down to corridor', hallFromBasement: 'Go up to corridor',
       backToKitchen: 'Back to kitchen',
     },
-    screwdriver: 'Screwdriver', knife: 'Knife', basementKey: 'Basement Key',
-    atticKey: 'Attic Key', pliers: 'Pliers', frontKey: 'Front Door Key',
-    code1: 'Code (part 1)', code2: 'Code (part 2)', code3: 'Code (part 3)',
+    screwdriver: 'Screwdriver', knife: 'Knife', basementKey: 'Boiler Room Key',
+    atticKey: 'Tech Floor Key', pliers: 'Pliers', frontKey: 'Hermetic Door Key',
+    code1: 'Airlock code (part 1)', code2: 'Airlock code (part 2)', code3: 'Airlock code (part 3)',
     actSearchWardrobe: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Search wardrobe',
     actFoundScrewdriver: 'You carefully opened the wardrobe. Among the rags you found a <b>screwdriver</b>. Might be useful.',
-    actTakeKnife: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Take knife from wall',
-    actFoundKnife: 'You pulled the knife from the wall. Your hand is shaking.',
+    actTakeKnife: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Take knife from strip',
+    actFoundKnife: 'You took the knife off the magnetic strip. Your hand is shaking.',
     actSearchDrawers: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Search drawers',
-    actFoundBasementKey: 'In one of the drawers, under newspapers from 1987, you found a <b>key labeled "BASEMENT"</b>.',
-    actLookBath: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Look in the bathtub',
-    actFoundCode1: 'You reached into the murky water... Your fingers found a plastic bag. Inside — a note: <b>"7 _ _"</b>. First part of the code!',
+    actFoundBasementKey: 'In one of the drawers, under newspapers from 1987, you found a <b>key labeled "BOILER ROOM"</b>.',
+    actLookBath: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Look in the basin',
+    actFoundCode1: 'You reached into the murky water... Your fingers found a plastic bag. Inside — a note: <b>"7 _ _"</b>. First part of the airlock code!',
     actCutPanel: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/knife.svg);mask-image:url(assets/icons/knife.svg)"></span> Pry open panel under sink',
-    actFoundAtticKey: 'The knife pried open the decorative panel. Behind it — an <b>attic key</b>, wrapped in electrical tape.',
-    actDoorLocked: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/padlock.svg);mask-image:url(assets/icons/padlock.svg)"></span> Door is locked',
-    actNeedKey: 'The door is locked. You need a key.',
+    actFoundAtticKey: 'The knife pried open the decorative panel. Behind it — a <b>tech floor key</b>, wrapped in electrical tape.',
+    actDoorLocked: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/padlock.svg);mask-image:url(assets/icons/padlock.svg)"></span> Locked',
+    actNeedKey: 'Locked. You need a key.',
     actSearchBoxes: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/search.svg);mask-image:url(assets/icons/search.svg)"></span> Search boxes',
     actFoundCode2: 'Among the junk you found an old photograph. On the back: <b>"_ 3 _"</b>. Second part of the code!',
     actTakePliers: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/screwdriver.svg);mask-image:url(assets/icons/screwdriver.svg)"></span> Take pliers',
@@ -614,55 +613,55 @@ const L = {
     actFoundCode3All: 'On the workbench, scratched with a nail: <b>"_ _ 9"</b>. Third part! Full code: <b>739</b>.',
     actFoundCode3Part: 'On the workbench, scratched with a nail: <b>"_ _ 9"</b>. Another code part! Find the rest.',
     actOpenPanel: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/screwdriver.svg);mask-image:url(assets/icons/screwdriver.svg)"></span> Open electrical panel with screwdriver',
-    actFoundFrontKey: 'Behind the electrical panel — a hidden <b>front door key</b>! But that\'s only one of three locks...',
-    actExamineDoor: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Examine front door',
-    actDoorStatus: (k,p,c) => `Massive door. Three locks:<br>${k} Top lock<br>${p} Middle bolt<br>${c} Bottom code lock`,
+    actFoundFrontKey: 'Behind the electrical panel — a hidden <b>hermetic door key</b>! But that\'s only one of three locks...',
+    actExamineDoor: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Examine hermetic door',
+    actDoorStatus: (k,p,c) => `Massive hermetic door. Three locks:<br>${k} Top lock<br>${p} Middle bolt<br>${c} Bottom code lock`,
     actUnlockAll: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> Unlock all locks!',
-    actUnlockedMsg: '<span class="event">Key turned... Bolt broken with pliers... 739 entered... Click! ALL LOCKS OPEN!</span>\n<span class="danger">The noise attracted Granny! She\'s close! RUN!</span>',
-    actRun: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> RUN OUTSIDE!',
-    actCodeLock: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Code lock on the gate',
-    actCodeLockDesc: 'The gate has a code lock. Three digits. You need to find the code.',
+    actUnlockedMsg: '<span class="event">Key turned... Bolt broken with pliers... 739 entered... Click! ALL LOCKS OPEN!</span>\n<span class="danger">The noise attracted the Gatherer! It\'s close! RUN!</span>',
+    actRun: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> BREAK OUT OF THE BLOCK!',
+    actCodeLock: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Code lock on the hatch',
+    actCodeLockDesc: 'The airlock hatch has a code lock. Three digits. You need to find the code.',
     actEnterCode: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/code.svg);mask-image:url(assets/icons/code.svg)"></span> Enter code 739',
-    actGarageOpen: '<span class="event">You entered 739... The mechanism hummed, the gate creaked open!</span>\n<span class="danger">Granny definitely heard that!</span>',
-    actRunGarage: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> RUN THROUGH THE GATE!',
+    actGarageOpen: '<span class="event">You entered 739... The mechanism hummed, the hatch creaked open!</span>\n<span class="danger">The Gatherer definitely heard that!</span>',
+    actRunGarage: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/door.svg);mask-image:url(assets/icons/door.svg)"></span> LEAVE THROUGH THE AIRLOCK!',
     actHide: '<span class="game-icon" style="-webkit-mask-image:url(assets/icons/unaware.svg);mask-image:url(assets/icons/unaware.svg)"></span> Hide',
-    creakMsg: 'Somewhere in the house, a floorboard creaked...',
-    lockedBasement: 'The basement door is locked. You need a key.',
-    lockedAttic: 'The attic door is locked. You need a key.',
-    noiseWarning40: 'You\'re being too loud. She hears better than you think.',
-    noiseWarning60: 'Too loud. If she\'s nearby — she\'s already heading your way.',
-    noiseWarning80: 'Way too loud! That racket could wake the dead. She heard you.',
+    creakMsg: 'Somewhere in the block, a ceiling slab creaked...',
+    lockedBasement: 'The boiler room door is locked. You need a key.',
+    lockedAttic: 'The tech floor hatch is locked. You need a key.',
+    noiseWarning40: 'You\'re being too loud. The Gatherer hears better than you think.',
+    noiseWarning60: 'Too loud. If it\'s nearby — it\'s already heading your way.',
+    noiseWarning80: 'A racket across the whole block. Even the reassembled would hear that. The Gatherer knows where you are.',
     hideSafe: [
       'You hid in the shadows. Silence... Seems clear. Move carefully.',
       'You froze, holding your breath. A minute passed — not a sound. Keep going.',
-      'You waited in the dark. The house is quiet. The path seems open.',
-      'You pressed against the wall and stayed still. Quiet now. Time to move — but carefully.',
+      'You waited in the dark. The block is quiet. The path seems open.',
+      'You pressed against the concrete wall and stayed still. Quiet now. Time to move — but carefully.',
     ],
     hideNear: [
-      'You hid... Shuffling steps slowed... and faded. Granny is leaving!',
-      'You held your breath. Footsteps behind the wall... She turned and left. Close call!',
-      'You froze. The door handle jerked... but didn\'t turn. Granny walked past!',
-      'You pressed against the wall. A shadow flickered under the door... and vanished.',
-      'You hid behind furniture. Granny peeked in... didn\'t see you and shuffled away.',
+      'You hid... Wet steps slowed... and faded. The Gatherer is leaving!',
+      'You held your breath. Footsteps behind the wall... It turned and left. Close call!',
+      'You froze. The hermetic door handle jerked... but didn\'t turn. The Gatherer walked past!',
+      'You pressed against the wall. A shadow flickered under the door... and dissolved into the fog.',
+      'You hid behind the boxes. The Gatherer peeked in... didn\'t see you and shuffled away.',
     ],
     hideAlert: [
-      'You stayed still. Granny wandered nearby, muttering... Her steps faded. She lost your trail!',
-      'You hid. Granny stopped at the door, sniffing... Then growled and left.',
-      'You froze. Granny stood listening... An eternity... Then she limped away.',
+      'You stayed still. The Gatherer wandered nearby, muttering in stolen voices... Its steps faded. It lost your trail!',
+      'You hid. The Gatherer stopped at the door, sniffing... Then growled deep in its chest and left.',
+      'You froze. The Gatherer stood listening... An eternity... Then it dragged itself away.',
     ],
     grannyNearby: [
-      'Footsteps — right next to you. Granny is behind the wall.',
-      'Raspy breathing behind the door. She\'s standing there, listening.',
-      'Floorboards creak just outside your room. Don\'t move.',
-      'A shadow flickers under the door. She\'s RIGHT THERE.',
+      'Footsteps — right next to you. The Gatherer is behind the wall.',
+      'Wet breathing behind the door. It\'s standing there, listening.',
+      'Scraping on concrete just outside your room. Don\'t move.',
+      'A shadow flickers under the door. It\'s RIGHT THERE.',
       'Slow, heavy steps. Getting closer... closer...',
     ],
     grannyFar: [
-      'Shuffling from somewhere deep in the house. She\'s wandering.',
-      'A muffled creak — a door opened somewhere.',
-      'Distant footsteps in the silence. She hasn\'t found you yet.',
-      'Something fell in another room. She\'s searching, but doesn\'t know where you are.',
-      'Slow dragging steps. Far away — but that doesn\'t mean safe.',
+      'Shuffling from somewhere deep in the block. It\'s wandering.',
+      'A muffled scrape — a hermetic door swung somewhere.',
+      'Distant footsteps in the fog. It hasn\'t found you yet.',
+      'Something collapsed in another room. It\'s searching, but doesn\'t know where you are.',
+      'Slow dragging steps on concrete. Far away — but that doesn\'t mean safe.',
     ],
     actWatchAd: '[ +60 sec for watching ad ]',
     actAdRewarded: 'You earned extra time! +60 seconds.',
@@ -678,7 +677,7 @@ function icon(name) { return `<span class="game-icon" style="-webkit-mask-image:
 
 function applyLang() {
   document.documentElement.lang = lang === 'ru' ? 'ru' : 'en';
-  document.title = t('title') + ' — Horror Quest';
+  document.title = t('title') + ' — ' + (lang === 'ru' ? 'Текстовый квест' : 'Text Quest');
   $('menu-title').textContent = t('title');
   $('menu-desc').textContent = t('menuDesc');
   $('menu-btn').textContent = t('start');
@@ -687,19 +686,11 @@ function applyLang() {
 }
 
 // ============================================================
-//  АССЕТЫ (замените null на пути к файлам)
+//  АССЕТЫ
 // ============================================================
 const ASSETS = {
-  bgMusic: 'assets/ambient.wav',      // 'assets/ambient.mp3'
-  doorOpen: 'assets/door.wav',      // 'assets/door.wav'
-  doorLocked: 'assets/door.wav',    // 'assets/locked.mp3'
-  itemPickup: 'assets/pickup.wav',    // 'assets/pickup.mp3'
-  screamer: 'assets/screamer.wav',      // 'assets/screamer.mp3'
-  footsteps: 'assets/steps.wav',     // 'assets/steps.mp3'
-  creak: 'assets/creak.wav',         // 'assets/creak.mp3'
-  escape: null,        // 'assets/escape.mp3'
   roomImages: {
-    bedroom: 'assets/rooms/bedroom.png',     // 'assets/rooms/bedroom.jpg'
+    bedroom: 'assets/rooms/bedroom.png',
     hallway: 'assets/rooms/hallway.png',
     kitchen: 'assets/rooms/kitchen.png',
     basement: 'assets/rooms/basement.png',
@@ -708,87 +699,159 @@ const ASSETS = {
     attic: 'assets/rooms/attic.png',
     garage: 'assets/rooms/garage.png',
   },
-  screamerImage: 'assets/screamer.png', // 'assets/screamer.png'
+};
+
+// Звуковые ассеты (декодируются в буферы Web Audio API)
+const SOUND_ASSETS = {
+  bgMusic: 'assets/ambient.wav',
+  doorOpen: 'assets/door.wav',
+  doorLocked: 'assets/door.wav',
+  itemPickup: 'assets/pickup.wav',
+  footsteps: 'assets/steps.wav',
+  creak: 'assets/creak.wav',
+  escape: null,
 };
 
 // ============================================================
-//  ЗВУК (Web Audio API)
+//  ЗВУК — Web Audio API
+//  Весь звук идёт через AudioContext (без HTMLAudioElement),
+//  чтобы:
+//   - не появлялся системный медиаплеер (п.1.6.2.5);
+//   - мгновенно глушить/ставить на паузу при сворачивании,
+//     смене вкладки и показе рекламы (п.1.3, п.4.7).
 // ============================================================
-let audioCtx;
-function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+let audioCtx = null;
+let masterGain = null;
+const audioBuffers = {};
+let bgSource = null;
+let ambientInterval = null;
 
-function playAsset(key, maxMs, volume) {
-  if (ASSETS[key]) {
-    const a = new Audio(ASSETS[key]); a.volume = volume !== undefined ? volume : 0.4; a.play().catch(()=>{});
-    if (maxMs) setTimeout(() => { a.pause(); a.currentTime = 0; }, maxMs);
-    return;
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = muted ? 0 : 1;
+    masterGain.connect(audioCtx.destination);
   }
-  synthSound(key);
 }
 
-function synthSound(type) {
+async function loadSoundAssets() {
+  ensureAudio();
+  await Promise.all(Object.entries(SOUND_ASSETS).map(async ([key, url]) => {
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const arr = await res.arrayBuffer();
+      audioBuffers[key] = await audioCtx.decodeAudioData(arr);
+    } catch(e) { /* отсутствует — будет синтез */ }
+  }));
+}
+
+// Пауза/возобновление всего звука разом
+function suspendAudio() {
+  if (audioCtx && audioCtx.state === 'running') audioCtx.suspend().catch(()=>{});
+}
+function resumeAudio() {
+  if (audioCtx && audioCtx.state === 'suspended' && !muted && !document.hidden) {
+    audioCtx.resume().catch(()=>{});
+  }
+}
+
+function playAsset(key, maxMs, volume) {
+  if (document.hidden) return;
+  ensureAudio();
+  const buf = audioBuffers[key];
+  if (buf) {
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const g = audioCtx.createGain();
+    g.gain.value = volume !== undefined ? volume : 0.4;
+    src.connect(g); g.connect(masterGain);
+    src.start();
+    if (maxMs) setTimeout(() => { try { src.stop(); } catch(e){} }, maxMs);
+    return;
+  }
+  synthSound(key, volume);
+}
+
+function synthSound(type, volume) {
   ensureAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.connect(gain); gain.connect(masterGain);
+  const v = volume !== undefined ? volume : 1;
   const now = audioCtx.currentTime;
   switch(type) {
     case 'doorOpen':
       osc.type='sawtooth'; osc.frequency.setValueAtTime(120,now);
       osc.frequency.linearRampToValueAtTime(60,now+.4);
-      gain.gain.setValueAtTime(.07,now); gain.gain.linearRampToValueAtTime(0,now+.5);
+      gain.gain.setValueAtTime(.07*v,now); gain.gain.linearRampToValueAtTime(0,now+.5);
       osc.start(now); osc.stop(now+.5); break;
     case 'doorLocked':
       osc.type='square'; osc.frequency.setValueAtTime(200,now);
-      gain.gain.setValueAtTime(.06,now); gain.gain.linearRampToValueAtTime(0,now+.15);
+      gain.gain.setValueAtTime(.06*v,now); gain.gain.linearRampToValueAtTime(0,now+.15);
       osc.start(now); osc.stop(now+.15);
       setTimeout(()=>{ ensureAudio(); const o2=audioCtx.createOscillator(); const g2=audioCtx.createGain();
-        o2.connect(g2);g2.connect(audioCtx.destination);o2.type='square';o2.frequency.value=160;
-        g2.gain.setValueAtTime(.06,audioCtx.currentTime);g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);
+        o2.connect(g2);g2.connect(masterGain);o2.type='square';o2.frequency.value=160;
+        g2.gain.setValueAtTime(.06*v,audioCtx.currentTime);g2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);
         o2.start();o2.stop(audioCtx.currentTime+.15);},180); break;
     case 'itemPickup':
       osc.type='sine'; osc.frequency.setValueAtTime(600,now);
       osc.frequency.linearRampToValueAtTime(900,now+.12);
-      gain.gain.setValueAtTime(.05,now); gain.gain.linearRampToValueAtTime(0,now+.2);
+      gain.gain.setValueAtTime(.05*v,now); gain.gain.linearRampToValueAtTime(0,now+.2);
       osc.start(now); osc.stop(now+.2); break;
-    case 'screamer':
-      osc.type='sawtooth'; osc.frequency.setValueAtTime(180,now);
-      osc.frequency.linearRampToValueAtTime(800,now+.1);
-      osc.frequency.linearRampToValueAtTime(200,now+.6);
-      gain.gain.setValueAtTime(.18,now); gain.gain.linearRampToValueAtTime(.15,now+.8);
-      gain.gain.linearRampToValueAtTime(0,now+1.2);
-      osc.start(now); osc.stop(now+1.2); break;
     case 'footsteps':
       osc.type='triangle'; osc.frequency.value=80;
-      gain.gain.setValueAtTime(.05,now); gain.gain.linearRampToValueAtTime(0,now+.1);
+      gain.gain.setValueAtTime(.05*v,now); gain.gain.linearRampToValueAtTime(0,now+.1);
       osc.start(now); osc.stop(now+.1); break;
     case 'creak':
       osc.type='sawtooth'; osc.frequency.setValueAtTime(300,now);
       osc.frequency.linearRampToValueAtTime(150,now+.6);
-      gain.gain.setValueAtTime(.05,now); gain.gain.linearRampToValueAtTime(0,now+.7);
+      gain.gain.setValueAtTime(.05*v,now); gain.gain.linearRampToValueAtTime(0,now+.7);
       osc.start(now); osc.stop(now+.7); break;
+    case 'collapse':
+      // Спокойный низкий «нарастающий» гул поглощения туманом (не скример)
+      osc.type='sine'; osc.frequency.setValueAtTime(160,now);
+      osc.frequency.exponentialRampToValueAtTime(40,now+1.3);
+      gain.gain.setValueAtTime(.0001,now);
+      gain.gain.exponentialRampToValueAtTime(.12*v,now+.5);
+      gain.gain.exponentialRampToValueAtTime(.0001,now+1.3);
+      osc.start(now); osc.stop(now+1.35); break;
     case 'escape':
       osc.type='sine'; osc.frequency.setValueAtTime(400,now);
       osc.frequency.linearRampToValueAtTime(800,now+.3);
-      gain.gain.setValueAtTime(.07,now); gain.gain.linearRampToValueAtTime(0,now+.5);
+      gain.gain.setValueAtTime(.07*v,now); gain.gain.linearRampToValueAtTime(0,now+.5);
       osc.start(now); osc.stop(now+.5); break;
     default:
       osc.type='sine'; osc.frequency.value=220;
-      gain.gain.setValueAtTime(.04,now); gain.gain.linearRampToValueAtTime(0,now+.2);
+      gain.gain.setValueAtTime(.04*v,now); gain.gain.linearRampToValueAtTime(0,now+.2);
       osc.start(now); osc.stop(now+.2);
   }
 }
 
-let ambientInterval;
-let bgMusicAudio = null;
 function startAmbient() {
-  if (ASSETS.bgMusic) { bgMusicAudio=new Audio(ASSETS.bgMusic);bgMusicAudio.loop=true;bgMusicAudio.volume=0.3;bgMusicAudio.play().catch(()=>{}); return; }
+  ensureAudio();
+  const buf = audioBuffers['bgMusic'];
+  if (buf) {
+    const g = audioCtx.createGain(); g.gain.value = 0.3; g.connect(masterGain);
+    bgSource = audioCtx.createBufferSource();
+    bgSource.buffer = buf; bgSource.loop = true;
+    bgSource.connect(g); bgSource.start();
+    return;
+  }
+  // Синтезированный фон, если файла нет
   ambientInterval = setInterval(()=>{
+    if (state && (state.dead || state.escaped || state.paused)) return;
     ensureAudio(); const o=audioCtx.createOscillator(); const g=audioCtx.createGain();
-    o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.value=45+Math.random()*15;
-    const n=audioCtx.currentTime;g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(.35,n+1);
+    o.connect(g);g.connect(masterGain);o.type='sine';o.frequency.value=45+Math.random()*15;
+    const n=audioCtx.currentTime;g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(.25,n+1);
     g.gain.linearRampToValueAtTime(0,n+3);o.start(n);o.stop(n+3);
   },4000);
+}
+
+function stopAmbient() {
+  if (bgSource) { try { bgSource.stop(); } catch(e){} bgSource = null; }
+  if (ambientInterval) { clearInterval(ambientInterval); ambientInterval = null; }
 }
 
 // ============================================================
@@ -959,7 +1022,6 @@ function buildActions() {
     listenBtn.title = t('listenBtn');
     listenBtn.onclick = () => {
       const roomName = tRoom(target).name;
-      // rooms adjacent to target that are NOT the player's current room
       const adjToTarget = Object.keys(ROOM_EXITS[target] || {}).filter(r => r !== state.room);
       if (state.grannyRoom === target) {
         playAsset('footsteps', 1500, 0.4);
@@ -1004,9 +1066,9 @@ function buildActions() {
 }
 
 function getRoomColor(id) {
-  const c = { bedroom:'#12100e',hallway:'#0e0d0b',kitchen:'#100e08',living:'#0f0d0a',
-    bathroom:'#0a0e10',attic:'#110f0a',basement:'#080a0c',garage:'#0c0c0c' };
-  return c[id]||'#0e0e0e';
+  const c = { bedroom:'#140c1e',hallway:'#0e0c18',kitchen:'#120e16',living:'#100c1a',
+    bathroom:'#0c0e1a',attic:'#120e18',basement:'#0a0a12',garage:'#0c0a14' };
+  return c[id]||'#0e0c12';
 }
 
 function setText(html, cls) {
@@ -1033,16 +1095,13 @@ function updateInventory() {
 }
 
 // ============================================================
-//  ШУМ — ПЕРЕРАБОТАННЫЙ
-//  Теперь шум реально влияет: предупреждения, тревога бабки,
-//  и постоянный фоновый тик затухания
+//  ШУМ
 // ============================================================
 function addNoise(n) {
   const before = state.noise;
   state.noise = Math.min(100, state.noise + n);
   updateNoise();
 
-  // Предупреждения при пересечении порогов
   if (before < 40 && state.noise >= 40) {
     setText('<span class="danger">' + t('noiseWarning40') + '</span>');
   } else if (before < 60 && state.noise >= 60) {
@@ -1051,7 +1110,6 @@ function addNoise(n) {
     setText('<span class="danger">' + t('noiseWarning80') + '</span>');
   }
 
-  // Реакция бабки на шум
   checkGrannyNoise();
 }
 
@@ -1059,7 +1117,6 @@ function updateNoise() {
   $('noise-fill').style.width = state.noise + '%';
 }
 
-// Шум постоянно затухает
 let noiseDecayInterval;
 function startNoiseDecay() {
   noiseDecayInterval = setInterval(() => {
@@ -1071,7 +1128,6 @@ function startNoiseDecay() {
   }, 2000);
 }
 
-// Реакция бабки на текущий шум
 function checkGrannyNoise() {
   if (state.noise >= 80) {
     state.grannyAlert = Math.min(3, state.grannyAlert + 1);
@@ -1138,7 +1194,6 @@ function isGrannyAdjacent() {
 
 const DEAD_ENDS = ['basement', 'attic', 'garage'];
 
-// BFS: первый шаг из `from` к `to`
 function nextStepToward(from, to) {
   if (from === to) return null;
   const visited = new Set([from]);
@@ -1154,7 +1209,6 @@ function nextStepToward(from, to) {
   return null;
 }
 
-// Отступить подальше от игрока (вызывается из doHide)
 function retreatGranny() {
   const exits = Object.keys(ROOM_EXITS[state.grannyRoom] || {});
   const playerAdj = Object.keys(ROOM_EXITS[state.room] || {});
@@ -1166,20 +1220,20 @@ function retreatGranny() {
 }
 
 // ============================================================
-//  ИНДИКАТОР БАБКИ
+//  ИНДИКАТОР СБОРЩИКА
 // ============================================================
 function updateGrannyIndicator() {
   const el = $('granny-status'); if (!el) return;
   const near = isGrannyAdjacent();
   const a = state.grannyAlert;
-  if (near) { el.innerHTML = icon('nearby') + ' ' + t('statusNear'); el.style.color = '#ff2020'; }
+  if (near) { el.innerHTML = icon('nearby') + ' ' + t('statusNear'); el.style.color = '#b14fff'; }
   else if (a >= 2) { el.innerHTML = icon('search') + ' ' + t('statusSearch'); el.style.color = '#cc6600'; }
-  else if (a >= 1) { el.innerHTML = icon('wary') + ' ' + t('statusAlert'); el.style.color = '#aa8800'; }
+  else if (a >= 1) { el.innerHTML = icon('ear') + ' ' + t('statusAlert'); el.style.color = '#aa8800'; }
   else { el.innerHTML = icon('unaware') + ' ' + t('statusSleep'); el.style.color = '#556655'; }
 }
 
 // ============================================================
-//  БАБКА — ИИ
+//  СБОРЩИК — ИИ
 // ============================================================
 let grannyMoveInterval;
 function startGrannyAI() {
@@ -1198,12 +1252,10 @@ function startGrannyAI() {
                      : 0.12;
 
     if (Math.random() > moveChance) {
-      // Пропустили ход — медленно успокаивается
       if (alert > 0 && Math.random() < 0.25) {
         state.grannyAlert = Math.max(0, alert - 1);
         updateGrannyIndicator();
       }
-      // Скрип половиц — бабка стоит на месте, создаёт неуверенность
       const playerAdj0 = Object.keys(ROOM_EXITS[state.room] || {});
       const isNearPlayer = playerAdj0.includes(state.grannyRoom) || state.grannyRoom === state.room;
       const creakChance = isNearPlayer ? 0.55 : 0.20;
@@ -1218,22 +1270,18 @@ function startGrannyAI() {
     let next;
 
     if (alert >= 3) {
-      // ОХОТА: кратчайший путь к игроку
       const toward = nextStepToward(state.grannyRoom, state.room);
       next = (toward && Math.random() < 0.9) ? toward : pick(exits);
     } else if (alert >= 2) {
-      // ПОИСК: с вероятностью 60% идёт к игроку по BFS
       const toward = nextStepToward(state.grannyRoom, state.room);
       const approaching = exits.filter(r => playerAdj.includes(r) && r !== state.room);
       if (toward && Math.random() < 0.60) next = toward;
       else if (approaching.length && Math.random() < 0.40) next = pick(approaching);
       else next = pick(safeExits.length ? safeExits : exits);
     } else if (alert >= 1) {
-      // НАСТОРОЖЕНА: лёгкий уклон к игроку
       const toward = nextStepToward(state.grannyRoom, state.room);
       next = (toward && Math.random() < 0.30) ? toward : pick(safeExits.length ? safeExits : exits);
     } else {
-      // ПАТРУЛЬ: случайный обход, без тупиков
       next = pick(safeExits.length ? safeExits : exits);
     }
 
@@ -1242,7 +1290,6 @@ function startGrannyAI() {
 
     if (next === state.room) { grannyAttack(); return; }
 
-    // Сообщение об шагах если рядом с игроком
     if (playerAdj.includes(next)) {
       if (alert >= 2) {
         playAsset('footsteps', 1500, 0.4);
@@ -1260,18 +1307,18 @@ function startGrannyAI() {
 function grannyAttack() {
   if (state.dead || state.escaped) return;
   state.dead = true;
-  showScreamer();
+  gameplayStop();
+  showCollapse(() => gameOver());
 }
 
 // ============================================================
-//  СКРИМЕР
+//  ПОГЛОЩЕНИЕ ТУМАНОМ (вместо скримера)
 // ============================================================
-function showScreamer() {
-  const el = $('screamer');
-  if (ASSETS.screamerImage) el.querySelector('.face').style.backgroundImage = `url('${ASSETS.screamerImage}')`;
+function showCollapse(cb) {
+  const el = $('flash');
   el.classList.add('active');
-  playAsset('screamer');
-  setTimeout(()=>{ el.classList.remove('active'); gameOver(); }, 2000);
+  playAsset('collapse');
+  setTimeout(()=>{ el.classList.remove('active'); cb(); }, 1500);
 }
 
 // ============================================================
@@ -1280,21 +1327,27 @@ function showScreamer() {
 function gameOver() {
   clearAllIntervals();
   $('end-title').textContent = t('caughtTitle');
-  $('end-title').style.color = 'var(--accent)';
+  $('end-title').style.color = 'var(--accent-glow)';
   $('end-text').textContent = t('caughtText');
   $('end-screen').classList.add('active');
 }
 
 function timeUp() {
-  clearAllIntervals();
   state.dead = true;
-  showScreamer();
-  setTimeout(()=>{ $('end-text').textContent = t('timeUpText'); }, 2200);
+  gameplayStop();
+  showCollapse(() => {
+    clearAllIntervals();
+    $('end-title').textContent = t('caughtTitle');
+    $('end-title').style.color = 'var(--accent-glow)';
+    $('end-text').textContent = t('timeUpText');
+    $('end-screen').classList.add('active');
+  });
 }
 
 function winGame() {
   state.escaped = true;
   clearAllIntervals();
+  gameplayStop();
   $('game').classList.remove('active');
   $('end-title').textContent = t('winTitle');
   $('end-title').style.color = '#4a4';
@@ -1314,8 +1367,8 @@ function restartWithAd() {
 function clearAllIntervals() {
   clearInterval(timerInterval);
   clearInterval(grannyMoveInterval);
-  clearInterval(ambientInterval);
   clearInterval(noiseDecayInterval);
+  stopAmbient();
 }
 
 // ============================================================
@@ -1341,6 +1394,9 @@ function startGame() {
   state = freshState();
   $('menu-screen').classList.add('hidden');
   $('game').classList.add('active');
+  ensureAudio();
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  gameplayStart();
   startAmbient();
   startTimer();
   startGrannyAI();
@@ -1349,32 +1405,43 @@ function startGame() {
   setText(t('intro'));
 }
 
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-function onPageHide() {
-  if (bgMusicAudio) bgMusicAudio.pause();
-  if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
-}
-function onPageShow() {
-  if (!state || state.paused || muted) return;
-  if (bgMusicAudio && !state.dead && !state.escaped) bgMusicAudio.play().catch(()=>{});
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) onPageHide(); else onPageShow();
+// ============================================================
+//  п.1.6.2.7: блокируем выделение, перетаскивание и контекстное меню
+// ============================================================
+['contextmenu','selectstart','dragstart','gesturestart'].forEach(ev => {
+  document.addEventListener(ev, e => e.preventDefault());
 });
-window.addEventListener('pagehide', onPageHide);
-window.addEventListener('pageshow', onPageShow);
 
-applyLang();
-initYSDK();
+// ============================================================
+//  п.1.3: ставим звук И игру на паузу при сворачивании/смене вкладки
+// ============================================================
+function onPageHidden() {
+  if (state && (state.dead || state.escaped)) { suspendAudio(); return; }
+  pauseGame();
+}
+function onPageVisible() {
+  resumeGame();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) onPageHidden(); else onPageVisible();
+});
+window.addEventListener('pagehide', onPageHidden);
+window.addEventListener('blur', () => { if (document.hidden) onPageHidden(); });
 
-// Preload all room images and screamer
-(function preloadImages() {
-  const urls = [...Object.values(ASSETS.roomImages), ASSETS.screamerImage].filter(Boolean);
-  urls.forEach(src => { const img = new Image(); img.src = src; });
-})();
+// ============================================================
+//  ЗАГРУЗКА
+// ============================================================
+async function boot() {
+  applyLang();
+  await initYSDK();
+  applyLang();
+  try { await loadSoundAssets(); } catch(e) { console.warn('Audio load error:', e); }
+  // Предзагрузка изображений комнат
+  Object.values(ASSETS.roomImages).filter(Boolean).forEach(src => { const img = new Image(); img.src = src; });
+  // Game Ready API — сообщаем, что игра загружена и готова к показу
+  notifyGameReady();
+}
+boot();
 </script>
 </body>
 </html>
