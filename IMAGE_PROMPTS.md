@@ -15,7 +15,7 @@
 
 ## Локации (assets/rooms/*.png) — 16:9, ~1280×720
 
-### bedroom.png — Жилблок
+### bedroom.png — Жилая ячейка
 > a tiny brutalist concrete living cell, a sagging metal cot with crumpled sheets, a battered
 > wooden wardrobe, a red emergency signal lamp above the door casting crimson light, a boarded-up
 > window with violet Samosbor haze glowing through the cracks, peeling wallpaper, empty and quiet
@@ -30,7 +30,7 @@
 > hurry, a magnetic strip with kitchen knives on a tiled wall, a dripping rusty faucet, faint
 > violet fog seeping under the door, cold abandoned atmosphere
 
-### living.png — Холл (выход из блока)
+### living.png — Холл (переборка в заброшенное крыло)
 > a small dim lobby in front of a massive sealed hermetic blast door with three heavy locks and
 > a wheel valve, a dead old radio on a shelf, concrete walls with safety stencils and arrows,
 > a single emergency lamp, violet haze pooling near the floor
